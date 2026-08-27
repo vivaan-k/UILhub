@@ -1,5 +1,26 @@
-import { useState, useEffect, useMemo, useRef } from "react";
-import { Calculator, CalendarDays, MessageCircleQuestion, BookOpenText, LayoutDashboard, Plus, Clock, MapPin, ExternalLink, CheckCircle2, Circle, Trash2, Search, MessagesSquare, Send, CalendarClock, Pencil, X, Cpu, Copy, Check } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  Calculator,
+  CalendarDays,
+  MessageCircleQuestion,
+  BookOpenText,
+  LayoutDashboard,
+  Plus,
+  MapPin,
+  ExternalLink,
+  CheckCircle2,
+  Circle,
+  Trash2,
+  Search,
+  MessagesSquare,
+  Send,
+  CalendarClock,
+  Pencil,
+  X,
+  Cpu,
+  Copy,
+  Check,
+} from "lucide-react";
 
 const TOKENS = {
   bg: "#EEF2EC",
@@ -28,37 +49,140 @@ const K = {
   programs: "programs-list",
 };
 
-// 24-week concept progression mapped directly onto the categories the UIL
-// Constitution & Contest Rules lists for the high school Mathematics contest
-// (not Number Sense, which is a separate UIL event): general/basic math,
-// Algebra I, Geometry, Algebra II, Trigonometry, Analytic Geometry, Math
-// Analysis, Probability, Statistics, and elementary Calculus — ending with
-// Statistics and Calculus.
 const DEFAULT_CURRICULUM = [
-  { category: "Basic Math", concept: "Number Properties, Percents & Unit Conversions", blurb: "Real number properties, percent change, ratios, and rate problems — the 'basic math' section." },
-  { category: "Algebra I", concept: "Linear Equations & Inequalities", blurb: "Solving and graphing lines, slope, and systems represented graphically." },
-  { category: "Algebra I", concept: "Systems of Linear Equations", blurb: "Substitution, elimination, and word problems that reduce to 2+ equations." },
-  { category: "Algebra I", concept: "Exponents & Radicals", blurb: "Exponent rules, simplifying radicals, and rational exponents." },
-  { category: "Algebra I", concept: "Factoring & Quadratic Equations", blurb: "Factoring techniques, the quadratic formula, and the discriminant." },
-  { category: "Geometry", concept: "Triangles, Similarity & the Pythagorean Theorem", blurb: "Triangle inequality, similarity ratios, and right-triangle relationships." },
-  { category: "Geometry", concept: "Special Right Triangles & Right-Triangle Trig", blurb: "30-60-90 / 45-45-90 shortcuts and SOH-CAH-TOA applications." },
-  { category: "Geometry", concept: "Circles: Angles, Arcs & Sectors", blurb: "Central/inscribed angles, arc length, and sector area formulas." },
-  { category: "Geometry", concept: "Area, Surface Area & Volume", blurb: "2D/3D formulas for polygons, prisms, cylinders, cones, and spheres." },
-  { category: "Geometry", concept: "Coordinate Geometry", blurb: "Distance/midpoint formulas, slope relationships, and equations of lines and circles." },
-  { category: "Algebra II", concept: "Functions, Domain & Composition", blurb: "Domain/range, composition, inverses, and piecewise functions." },
-  { category: "Algebra II", concept: "Arithmetic & Geometric Sequences/Series", blurb: "Explicit and recursive formulas, sums of finite and infinite series." },
-  { category: "Algebra II", concept: "Logarithms & Exponential Functions", blurb: "Log rules, solving exponential equations, and growth/decay models." },
-  { category: "Algebra II", concept: "Complex Numbers", blurb: "i-powers, operations with complex numbers, and the complex plane." },
-  { category: "Algebra II", concept: "Matrices & Determinants", blurb: "Matrix operations, determinants, and using matrices to solve systems." },
-  { category: "Trigonometry", concept: "The Unit Circle & Trig Functions", blurb: "Radians, reference angles, and evaluating trig functions around the unit circle." },
-  { category: "Trigonometry", concept: "Trig Identities & Equations", blurb: "Pythagorean/sum-difference identities and solving trig equations." },
-  { category: "Trigonometry", concept: "Law of Sines & Law of Cosines", blurb: "Solving non-right triangles, including the ambiguous case." },
-  { category: "Analytic Geometry", concept: "Conic Sections", blurb: "Standard forms and key features of circles, parabolas, ellipses, and hyperbolas." },
-  { category: "Math Analysis", concept: "Polynomial & Rational Functions", blurb: "End behavior, zeros, asymptotes, and graphing rational functions." },
-  { category: "Probability", concept: "Counting Principles, Permutations & Combinations", blurb: "The counting principle, nPr vs nCr, and arrangements with repetition." },
-  { category: "Probability", concept: "Probability Rules & Number Theory", blurb: "Independent/dependent/conditional probability alongside primes, GCF/LCM, and divisibility." },
-  { category: "Statistics", concept: "Measures of Center & Spread", blurb: "Mean, median, mode, range, and standard deviation, plus how outliers shift them." },
-  { category: "Basic Calculus", concept: "Limits & Introduction to Derivatives", blurb: "Evaluating limits and basic differentiation rules — the final stretch of the test." },
+  {
+    category: "Basic Math",
+    concept: "Number Properties, Percents & Unit Conversions",
+    blurb: "Real number properties, percent change, ratios, and rate problems.",
+  },
+  {
+    category: "Algebra I",
+    concept: "Linear Equations & Inequalities",
+    blurb:
+      "Solving and graphing lines, slope, and systems represented graphically.",
+  },
+  {
+    category: "Algebra I",
+    concept: "Systems of Linear Equations",
+    blurb:
+      "Substitution, elimination, and word problems that reduce to 2+ equations.",
+  },
+  {
+    category: "Algebra I",
+    concept: "Exponents & Radicals",
+    blurb: "Exponent rules, simplifying radicals, and rational exponents.",
+  },
+  {
+    category: "Algebra I",
+    concept: "Factoring & Quadratic Equations",
+    blurb: "Factoring techniques, the quadratic formula, and the discriminant.",
+  },
+  {
+    category: "Geometry",
+    concept: "Triangles, Similarity & the Pythagorean Theorem",
+    blurb:
+      "Triangle inequality, similarity ratios, and right-triangle relationships.",
+  },
+  {
+    category: "Geometry",
+    concept: "Special Right Triangles & Right-Triangle Trig",
+    blurb: "30-60-90 / 45-45-90 shortcuts and SOH-CAH-TOA applications.",
+  },
+  {
+    category: "Geometry",
+    concept: "Circles: Angles, Arcs & Sectors",
+    blurb: "Central/inscribed angles, arc length, and sector area formulas.",
+  },
+  {
+    category: "Geometry",
+    concept: "Area, Surface Area & Volume",
+    blurb:
+      "2D/3D formulas for polygons, prisms, cylinders, cones, and spheres.",
+  },
+  {
+    category: "Geometry",
+    concept: "Coordinate Geometry",
+    blurb:
+      "Distance/midpoint formulas, slope relationships, and equations of lines and circles.",
+  },
+  {
+    category: "Algebra II",
+    concept: "Functions, Domain & Composition",
+    blurb: "Domain/range, composition, inverses, and piecewise functions.",
+  },
+  {
+    category: "Algebra II",
+    concept: "Arithmetic & Geometric Sequences/Series",
+    blurb:
+      "Explicit and recursive formulas, sums of finite and infinite series.",
+  },
+  {
+    category: "Algebra II",
+    concept: "Logarithms & Exponential Functions",
+    blurb: "Log rules, solving exponential equations, and growth/decay models.",
+  },
+  {
+    category: "Algebra II",
+    concept: "Complex Numbers",
+    blurb: "i-powers, operations with complex numbers, and the complex plane.",
+  },
+  {
+    category: "Algebra II",
+    concept: "Matrices & Determinants",
+    blurb:
+      "Matrix operations, determinants, and using matrices to solve systems.",
+  },
+  {
+    category: "Trigonometry",
+    concept: "The Unit Circle & Trig Functions",
+    blurb:
+      "Radians, reference angles, and evaluating trig functions around the unit circle.",
+  },
+  {
+    category: "Trigonometry",
+    concept: "Trig Identities & Equations",
+    blurb: "Pythagorean/sum-difference identities and solving trig equations.",
+  },
+  {
+    category: "Trigonometry",
+    concept: "Law of Sines & Law of Cosines",
+    blurb: "Solving non-right triangles, including the ambiguous case.",
+  },
+  {
+    category: "Analytic Geometry",
+    concept: "Conic Sections",
+    blurb:
+      "Standard forms and key features of circles, parabolas, ellipses, and hyperbolas.",
+  },
+  {
+    category: "Math Analysis",
+    concept: "Polynomial & Rational Functions",
+    blurb: "End behavior, zeros, asymptotes, and graphing rational functions.",
+  },
+  {
+    category: "Probability",
+    concept: "Counting Principles, Permutations & Combinations",
+    blurb:
+      "The counting principle, nPr vs nCr, and arrangements with repetition.",
+  },
+  {
+    category: "Probability",
+    concept: "Probability Rules & Number Theory",
+    blurb:
+      "Independent/dependent/conditional probability alongside primes, GCF/LCM, and divisibility.",
+  },
+  {
+    category: "Statistics",
+    concept: "Measures of Center & Spread",
+    blurb:
+      "Mean, median, mode, range, and standard deviation, plus how outliers shift them.",
+  },
+  {
+    category: "Basic Calculus",
+    concept: "Limits & Introduction to Derivatives",
+    blurb:
+      "Evaluating limits and basic differentiation rules — the final stretch of the test.",
+  },
 ];
 
 function nextMonday() {
@@ -69,6 +193,7 @@ function nextMonday() {
   d.setHours(0, 0, 0, 0);
   return d.toISOString().slice(0, 10);
 }
+
 function addDays(dateStr, n) {
   const d = new Date(dateStr + "T00:00:00");
   d.setDate(d.getDate() + n);
@@ -77,32 +202,40 @@ function addDays(dateStr, n) {
 
 async function loadList(key) {
   try {
-    const res = await window.storage.get(key, true);
-    return res && res.value ? JSON.parse(res.value) : [];
+    const res = localStorage.getItem(key);
+    return res ? JSON.parse(res) : [];
   } catch {
     return [];
   }
 }
+
 async function saveList(key, list) {
   try {
-    await window.storage.set(key, JSON.stringify(list), true);
+    localStorage.setItem(key, JSON.stringify(list));
   } catch (e) {
     console.error("storage save failed", e);
   }
 }
+
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
+
 function daysUntil(dateStr) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const target = new Date(dateStr + "T00:00:00");
   return Math.round((target - today) / 86400000);
 }
+
 function fmtDate(dateStr) {
   if (!dateStr) return "";
   const d = new Date(dateStr + "T00:00:00");
-  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  return d.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 function GridBG() {
@@ -123,7 +256,18 @@ function GridBG() {
 function Field({ label, children }) {
   return (
     <label style={{ display: "block", marginBottom: 12 }}>
-      <span style={{ fontFamily: UI_FONT, fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: TOKENS.muted, display: "block", marginBottom: 4 }}>
+      <span
+        style={{
+          fontFamily: UI_FONT,
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: "0.06em",
+          textTransform: "uppercase",
+          color: TOKENS.muted,
+          display: "block",
+          marginBottom: 4,
+        }}
+      >
         {label}
       </span>
       {children}
@@ -143,8 +287,19 @@ const inputStyle = {
   background: "#FBFCFA",
 };
 
-function Button({ children, onClick, variant = "primary", type = "button", style = {} }) {
-  const bg = variant === "primary" ? TOKENS.primary : variant === "danger" ? TOKENS.flag : "transparent";
+function Button({
+  children,
+  onClick,
+  variant = "primary",
+  type = "button",
+  style = {},
+}) {
+  const bg =
+    variant === "primary"
+      ? TOKENS.primary
+      : variant === "danger"
+      ? TOKENS.flag
+      : "transparent";
   const color = variant === "ghost" ? TOKENS.primary : "#fff";
   return (
     <button
@@ -190,7 +345,17 @@ function Card({ children, style = {} }) {
 
 function Empty({ text }) {
   return (
-    <div style={{ padding: "32px 16px", textAlign: "center", color: TOKENS.muted, fontFamily: UI_FONT, fontSize: 14, border: `1.5px dashed ${TOKENS.grid}`, borderRadius: 10 }}>
+    <div
+      style={{
+        padding: "32px 16px",
+        textAlign: "center",
+        color: TOKENS.muted,
+        fontFamily: UI_FONT,
+        fontSize: 14,
+        border: `1.5px dashed ${TOKENS.grid}`,
+        borderRadius: 10,
+      }}
+    >
       {text}
     </div>
   );
@@ -205,28 +370,31 @@ export default function UILMathHQ() {
   const [concepts, setConcepts] = useState([]);
   const [chat, setChat] = useState([]);
   const [schedule, setSchedule] = useState([]);
-  const [scheduleSettings, setScheduleSettings] = useState({ startDate: nextMonday() });
+  const [scheduleSettings, setScheduleSettings] = useState({
+    startDate: nextMonday(),
+  });
   const [programs, setPrograms] = useState([]);
 
   useEffect(() => {
     (async () => {
-      const [s, m, q, c, ch, sched, schedSettingsRes, progs] = await Promise.all([
-        loadList(K.solutions),
-        loadList(K.meets),
-        loadList(K.questions),
-        loadList(K.concepts),
-        loadList(K.chat),
-        loadList(K.schedule),
-        (async () => {
-          try {
-            const r = await window.storage.get(K.scheduleSettings, true);
-            return r && r.value ? JSON.parse(r.value) : null;
-          } catch {
-            return null;
-          }
-        })(),
-        loadList(K.programs),
-      ]);
+      const [s, m, q, c, ch, sched, schedSettingsRes, progs] =
+        await Promise.all([
+          loadList(K.solutions),
+          loadList(K.meets),
+          loadList(K.questions),
+          loadList(K.concepts),
+          loadList(K.chat),
+          loadList(K.schedule),
+          (async () => {
+            try {
+              const r = localStorage.getItem(K.scheduleSettings);
+              return r ? JSON.parse(r) : null;
+            } catch {
+              return null;
+            }
+          })(),
+          loadList(K.programs),
+        ]);
       setSolutions(s);
       setMeets(m);
       setQuestions(q);
@@ -237,13 +405,20 @@ export default function UILMathHQ() {
       let settings = schedSettingsRes;
       if (!settings) {
         settings = { startDate: nextMonday() };
-        await window.storage.set(K.scheduleSettings, JSON.stringify(settings), true);
+        localStorage.setItem(K.scheduleSettings, JSON.stringify(settings));
       }
       setScheduleSettings(settings);
 
       let weeks = sched;
       if (!weeks || weeks.length === 0) {
-        weeks = DEFAULT_CURRICULUM.map((c, i) => ({ id: uid(), weekNumber: i + 1, concept: c.concept, blurb: c.blurb, category: c.category, completed: false }));
+        weeks = DEFAULT_CURRICULUM.map((c, i) => ({
+          id: uid(),
+          weekNumber: i + 1,
+          concept: c.concept,
+          blurb: c.blurb,
+          category: c.category,
+          completed: false,
+        }));
         await saveList(K.schedule, weeks);
       }
       setSchedule(weeks);
@@ -252,18 +427,10 @@ export default function UILMathHQ() {
     })();
   }, []);
 
-  // Poll chat for new messages while the Chat tab is open, so it feels closer to live.
-  useEffect(() => {
-    if (tab !== "chat") return;
-    const interval = setInterval(async () => {
-      const latest = await loadList(K.chat);
-      setChat(latest);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [tab]);
-
   const upcomingMeet = useMemo(() => {
-    const future = meets.filter((m) => daysUntil(m.date) >= 0).sort((a, b) => new Date(a.date) - new Date(b.date));
+    const future = meets
+      .filter((m) => daysUntil(m.date) >= 0)
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
     return future[0] || null;
   }, [meets]);
 
@@ -275,9 +442,17 @@ export default function UILMathHQ() {
     today.setHours(0, 0, 0, 0);
     let best = null;
     for (const w of schedule) {
-      const start = new Date(addDays(scheduleSettings.startDate, (w.weekNumber - 1) * 7) + "T00:00:00");
-      const end = new Date(addDays(scheduleSettings.startDate, w.weekNumber * 7 - 1) + "T00:00:00");
-      if (today >= start && today <= end) { best = w; break; }
+      const start = new Date(
+        addDays(scheduleSettings.startDate, (w.weekNumber - 1) * 7) +
+          "T00:00:00"
+      );
+      const end = new Date(
+        addDays(scheduleSettings.startDate, w.weekNumber * 7 - 1) + "T00:00:00"
+      );
+      if (today >= start && today <= end) {
+        best = w;
+        break;
+      }
     }
     return best;
   }, [schedule, scheduleSettings]);
@@ -295,45 +470,128 @@ export default function UILMathHQ() {
 
   if (loading) {
     return (
-      <div style={{ fontFamily: UI_FONT, color: TOKENS.muted, padding: 40, textAlign: "center" }}>
+      <div
+        style={{
+          fontFamily: UI_FONT,
+          color: TOKENS.muted,
+          padding: 40,
+          textAlign: "center",
+        }}
+      >
         Loading team hub…
       </div>
     );
   }
 
   return (
-    <div style={{ position: "relative", minHeight: 600, background: TOKENS.bg, borderRadius: 14, overflow: "hidden", fontFamily: BODY_FONT }}>
+    <div
+      style={{
+        position: "relative",
+        minHeight: 600,
+        background: TOKENS.bg,
+        borderRadius: 14,
+        overflow: "hidden",
+        fontFamily: BODY_FONT,
+      }}
+    >
       <GridBG />
       <div style={{ position: "relative" }}>
-        {/* Header */}
-        <div style={{ padding: "22px 24px 16px", borderBottom: `1px solid ${TOKENS.grid}` }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12 }}>
+        <div
+          style={{
+            padding: "22px 24px 16px",
+            borderBottom: `1px solid ${TOKENS.grid}`,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              flexWrap: "wrap",
+              gap: 12,
+            }}
+          >
             <div>
-              <div style={{ fontFamily: DISPLAY_FONT, fontSize: 12, letterSpacing: "0.14em", color: TOKENS.accent, fontWeight: 700, marginBottom: 4 }}>
+              <div
+                style={{
+                  fontFamily: DISPLAY_FONT,
+                  fontSize: 12,
+                  letterSpacing: "0.14em",
+                  color: TOKENS.accent,
+                  fontWeight: 700,
+                  marginBottom: 4,
+                }}
+              >
                 UIL · MATHEMATICS
               </div>
-              <h1 style={{ fontFamily: DISPLAY_FONT, fontSize: 26, color: TOKENS.ink, margin: 0, fontWeight: 700 }}>
+              <h1
+                style={{
+                  fontFamily: DISPLAY_FONT,
+                  fontSize: 26,
+                  color: TOKENS.ink,
+                  margin: 0,
+                  fontWeight: 700,
+                }}
+              >
                 Team HQ
               </h1>
             </div>
             {upcomingMeet ? (
-              <div style={{ background: TOKENS.primaryDark, color: "#fff", borderRadius: 10, padding: "10px 16px", textAlign: "center", fontFamily: DISPLAY_FONT }}>
-                <div style={{ fontSize: 10, letterSpacing: "0.1em", opacity: 0.75, marginBottom: 2 }}>NEXT MEET</div>
-                <div style={{ fontSize: 22, fontWeight: 700, lineHeight: 1 }}>
-                  {daysUntil(upcomingMeet.date) === 0 ? "TODAY" : `${daysUntil(upcomingMeet.date)}d`}
+              <div
+                style={{
+                  background: TOKENS.primaryDark,
+                  color: "#fff",
+                  borderRadius: 10,
+                  padding: "10px 16px",
+                  textAlign: "center",
+                  fontFamily: DISPLAY_FONT,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: "0.1em",
+                    opacity: 0.75,
+                    marginBottom: 2,
+                  }}
+                >
+                  NEXT MEET
                 </div>
-                <div style={{ fontSize: 11, opacity: 0.85, marginTop: 2 }}>{upcomingMeet.name}</div>
+                <div style={{ fontSize: 22, fontWeight: 700, lineHeight: 1 }}>
+                  {daysUntil(upcomingMeet.date) === 0
+                    ? "TODAY"
+                    : `${daysUntil(upcomingMeet.date)}d`}
+                </div>
+                <div style={{ fontSize: 11, opacity: 0.85, marginTop: 2 }}>
+                  {upcomingMeet.name}
+                </div>
               </div>
             ) : (
-              <div style={{ background: TOKENS.paper, border: `1px dashed ${TOKENS.grid}`, borderRadius: 10, padding: "10px 16px", color: TOKENS.muted, fontFamily: UI_FONT, fontSize: 12 }}>
+              <div
+                style={{
+                  background: TOKENS.paper,
+                  border: `1px dashed ${TOKENS.grid}`,
+                  borderRadius: 10,
+                  padding: "10px 16px",
+                  color: TOKENS.muted,
+                  fontFamily: UI_FONT,
+                  fontSize: 12,
+                }}
+              >
                 No upcoming meets on the calendar yet
               </div>
             )}
           </div>
         </div>
 
-        {/* Tabs */}
-        <div style={{ display: "flex", gap: 4, padding: "12px 24px 0", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 4,
+            padding: "12px 24px 0",
+            flexWrap: "wrap",
+          }}
+        >
           {tabs.map((t) => {
             const Icon = t.icon;
             const active = tab === t.id;
@@ -348,7 +606,9 @@ export default function UILMathHQ() {
                   padding: "8px 14px",
                   borderRadius: "8px 8px 0 0",
                   border: "none",
-                  borderBottom: active ? `2px solid ${TOKENS.primary}` : "2px solid transparent",
+                  borderBottom: active
+                    ? `2px solid ${TOKENS.primary}`
+                    : "2px solid transparent",
                   background: active ? TOKENS.paper : "transparent",
                   color: active ? TOKENS.primary : TOKENS.muted,
                   fontFamily: UI_FONT,
@@ -360,7 +620,18 @@ export default function UILMathHQ() {
                 <Icon size={15} />
                 {t.label}
                 {t.id === "questions" && openQuestions > 0 && (
-                  <span style={{ background: TOKENS.flag, color: "#fff", borderRadius: 999, fontSize: 10, padding: "1px 6px", fontFamily: UI_FONT }}>{openQuestions}</span>
+                  <span
+                    style={{
+                      background: TOKENS.flag,
+                      color: "#fff",
+                      borderRadius: 999,
+                      fontSize: 10,
+                      padding: "1px 6px",
+                      fontFamily: UI_FONT,
+                    }}
+                  >
+                    {openQuestions}
+                  </span>
                 )}
               </button>
             );
@@ -369,16 +640,39 @@ export default function UILMathHQ() {
 
         <div style={{ padding: 24 }}>
           {tab === "dashboard" && (
-            <Dashboard solutions={solutions} meets={meets} questions={questions} concepts={concepts} programs={programs} setTab={setTab} currentWeek={currentWeek} />
+            <Dashboard
+              solutions={solutions}
+              meets={meets}
+              questions={questions}
+              concepts={concepts}
+              programs={programs}
+              setTab={setTab}
+              currentWeek={currentWeek}
+            />
           )}
           {tab === "schedule" && (
-            <Schedule schedule={schedule} setSchedule={setSchedule} scheduleSettings={scheduleSettings} setScheduleSettings={setScheduleSettings} />
+            <Schedule
+              schedule={schedule}
+              setSchedule={setSchedule}
+              scheduleSettings={scheduleSettings}
+              setScheduleSettings={setScheduleSettings}
+            />
           )}
-          {tab === "solutions" && <Solutions solutions={solutions} setSolutions={setSolutions} />}
-          {tab === "programs" && <Programs programs={programs} setPrograms={setPrograms} />}
-          {tab === "calendar" && <MeetCalendar meets={meets} setMeets={setMeets} />}
-          {tab === "questions" && <Questions questions={questions} setQuestions={setQuestions} />}
-          {tab === "concepts" && <Concepts concepts={concepts} setConcepts={setConcepts} />}
+          {tab === "solutions" && (
+            <Solutions solutions={solutions} setSolutions={setSolutions} />
+          )}
+          {tab === "programs" && (
+            <Programs programs={programs} setPrograms={setPrograms} />
+          )}
+          {tab === "calendar" && (
+            <MeetCalendar meets={meets} setMeets={setMeets} />
+          )}
+          {tab === "questions" && (
+            <Questions questions={questions} setQuestions={setQuestions} />
+          )}
+          {tab === "concepts" && (
+            <Concepts concepts={concepts} setConcepts={setConcepts} />
+          )}
           {tab === "chat" && <Chat chat={chat} setChat={setChat} />}
         </div>
       </div>
@@ -386,734 +680,401 @@ export default function UILMathHQ() {
   );
 }
 
-function Dashboard({ solutions, meets, questions, concepts, programs, setTab, currentWeek }) {
+function Dashboard({
+  solutions,
+  meets,
+  questions,
+  concepts,
+  programs,
+  setTab,
+  currentWeek,
+}) {
   const stats = [
-    { label: "Solutions logged", value: solutions.length, icon: Calculator, tab: "solutions" },
-    { label: "Calc programs", value: programs.length, icon: Cpu, tab: "programs" },
-    { label: "Meets tracked", value: meets.length, icon: CalendarDays, tab: "calendar" },
-    { label: "Open questions", value: questions.filter((q) => !q.resolved).length, icon: MessageCircleQuestion, tab: "questions" },
-    { label: "Concept notes", value: concepts.length, icon: BookOpenText, tab: "concepts" },
+    {
+      label: "Solutions logged",
+      value: solutions.length,
+      icon: Calculator,
+      tab: "solutions",
+    },
+    {
+      label: "Calc programs",
+      value: programs.length,
+      icon: Cpu,
+      tab: "programs",
+    },
+    {
+      label: "Meets tracked",
+      value: meets.length,
+      icon: CalendarDays,
+      tab: "calendar",
+    },
+    {
+      label: "Open questions",
+      value: questions.filter((q) => !q.resolved).length,
+      icon: MessageCircleQuestion,
+      tab: "questions",
+    },
+    {
+      label: "Concept notes",
+      value: concepts.length,
+      icon: BookOpenText,
+      tab: "concepts",
+    },
   ];
-  const recentQuestions = [...questions].filter((q) => !q.resolved).slice(-3).reverse();
   return (
     <div>
       {currentWeek && (
-        <Card style={{ background: TOKENS.primaryDark, border: "none", marginBottom: 20, cursor: "pointer" }}>
+        <Card
+          style={{
+            background: TOKENS.primaryDark,
+            border: "none",
+            marginBottom: 20,
+            cursor: "pointer",
+          }}
+        >
           <div onClick={() => setTab("schedule")}>
-            <div style={{ fontFamily: UI_FONT, fontSize: 11, letterSpacing: "0.08em", color: TOKENS.accent, fontWeight: 700 }}>
-              THIS WEEK'S CONCEPT · WEEK {currentWeek.weekNumber}{currentWeek.category ? ` · ${currentWeek.category.toUpperCase()}` : ""}
+            <div
+              style={{
+                fontFamily: UI_FONT,
+                fontSize: 11,
+                letterSpacing: "0.08em",
+                color: TOKENS.accent,
+                fontWeight: 700,
+              }}
+            >
+              THIS WEEK'S CONCEPT · WEEK {currentWeek.weekNumber}
+              {currentWeek.category
+                ? ` · ${currentWeek.category.toUpperCase()}`
+                : ""}
             </div>
-            <div style={{ fontFamily: DISPLAY_FONT, fontSize: 20, color: "#fff", fontWeight: 700, marginTop: 4 }}>
+            <div
+              style={{
+                fontFamily: DISPLAY_FONT,
+                fontSize: 20,
+                color: "#fff",
+                fontWeight: 700,
+                marginTop: 4,
+              }}
+            >
               {currentWeek.concept}
             </div>
-            <div style={{ fontFamily: BODY_FONT, fontSize: 13.5, color: "#DCE9E4", marginTop: 4 }}>
+            <div
+              style={{
+                fontFamily: BODY_FONT,
+                fontSize: 13.5,
+                color: "#DCE9E4",
+                marginTop: 4,
+              }}
+            >
               {currentWeek.blurb}
             </div>
           </div>
         </Card>
       )}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 24 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+          gap: 12,
+          marginBottom: 24,
+        }}
+      >
         {stats.map((s) => {
           const Icon = s.icon;
           return (
             <Card key={s.label} style={{ cursor: "pointer" }}>
               <div onClick={() => setTab(s.tab)}>
                 <Icon size={18} color={TOKENS.primary} />
-                <div style={{ fontFamily: DISPLAY_FONT, fontSize: 28, color: TOKENS.ink, marginTop: 8, fontWeight: 700 }}>{s.value}</div>
-                <div style={{ fontFamily: UI_FONT, fontSize: 12, color: TOKENS.muted, marginTop: 2 }}>{s.label}</div>
+                <div
+                  style={{
+                    fontFamily: DISPLAY_FONT,
+                    fontSize: 28,
+                    color: TOKENS.ink,
+                    marginTop: 8,
+                    fontWeight: 700,
+                  }}
+                >
+                  {s.value}
+                </div>
+                <div
+                  style={{
+                    fontFamily: UI_FONT,
+                    fontSize: 12,
+                    color: TOKENS.muted,
+                    marginTop: 2,
+                  }}
+                >
+                  {s.label}
+                </div>
               </div>
             </Card>
           );
         })}
       </div>
-
-      <div style={{ fontFamily: UI_FONT, fontSize: 13, fontWeight: 700, color: TOKENS.ink, marginBottom: 10 }}>
-        Needs an answer
-      </div>
-      {recentQuestions.length === 0 ? (
-        <Empty text="No open questions right now — nice work staying on top of it." />
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {recentQuestions.map((q) => (
-            <Card key={q.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <div style={{ fontFamily: BODY_FONT, fontSize: 14, color: TOKENS.ink }}>{q.text}</div>
-                <div style={{ fontFamily: UI_FONT, fontSize: 11, color: TOKENS.muted, marginTop: 2 }}>
-                  {q.topic || "General"} · asked by {q.askedBy || "Anonymous"}
-                </div>
-              </div>
-              <Button variant="ghost" onClick={() => setTab("questions")}>Answer</Button>
-            </Card>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
 
-function Solutions({ solutions, setSolutions }) {
-  const [form, setForm] = useState({ competition: "", topic: "", problemNum: "", solutionText: "", submittedBy: "" });
-  const [filter, setFilter] = useState("");
-
-  const add = async () => {
-    if (!form.solutionText.trim() || !form.competition.trim()) return;
-    const entry = { id: uid(), ...form, date: new Date().toISOString() };
-    const next = [entry, ...solutions];
-    setSolutions(next);
-    await saveList(K.solutions, next);
-    setForm({ competition: "", topic: "", problemNum: "", solutionText: "", submittedBy: "" });
-  };
-
-  const remove = async (id) => {
-    const next = solutions.filter((s) => s.id !== id);
-    setSolutions(next);
-    await saveList(K.solutions, next);
-  };
-
-  const filtered = solutions.filter((s) =>
-    (s.competition + s.topic + s.solutionText).toLowerCase().includes(filter.toLowerCase())
-  );
-
-  return (
-    <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 20 }}>
-      <Card>
-        <div style={{ fontFamily: UI_FONT, fontWeight: 700, fontSize: 13, marginBottom: 12, color: TOKENS.ink }}>Add a solution</div>
-        <Field label="Competition"><input style={inputStyle} value={form.competition} onChange={(e) => setForm({ ...form, competition: e.target.value })} placeholder="e.g. TMSCA Regional" /></Field>
-        <Field label="Topic"><input style={inputStyle} value={form.topic} onChange={(e) => setForm({ ...form, topic: e.target.value })} placeholder="e.g. Sequences" /></Field>
-        <Field label="Problem #"><input style={inputStyle} value={form.problemNum} onChange={(e) => setForm({ ...form, problemNum: e.target.value })} placeholder="e.g. #24" /></Field>
-        <Field label="Solution (or a link to a photo/doc)">
-          <textarea style={{ ...inputStyle, minHeight: 90, resize: "vertical" }} value={form.solutionText} onChange={(e) => setForm({ ...form, solutionText: e.target.value })} placeholder="Write the worked solution, or paste a Drive/photo link..." />
-        </Field>
-        <Field label="Your name"><input style={inputStyle} value={form.submittedBy} onChange={(e) => setForm({ ...form, submittedBy: e.target.value })} placeholder="e.g. Jordan" /></Field>
-        <Button onClick={add} style={{ width: "100%", justifyContent: "center" }}><Plus size={14} /> Add to bank</Button>
-      </Card>
-
-      <div>
-        <div style={{ position: "relative", marginBottom: 14 }}>
-          <Search size={15} color={TOKENS.muted} style={{ position: "absolute", left: 10, top: 10 }} />
-          <input style={{ ...inputStyle, paddingLeft: 32 }} placeholder="Search solutions..." value={filter} onChange={(e) => setFilter(e.target.value)} />
-        </div>
-        {filtered.length === 0 ? (
-          <Empty text={solutions.length === 0 ? "No solutions logged yet. Add the first one — every solved problem someone writes up saves the next person from re-deriving it." : "No solutions match that search."} />
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {filtered.map((s) => (
-              <Card key={s.id}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                  <div style={{ fontFamily: DISPLAY_FONT, fontSize: 12, color: TOKENS.primary, fontWeight: 700 }}>
-                    {s.competition} {s.problemNum && `· ${s.problemNum}`}
-                  </div>
-                  <button onClick={() => remove(s.id)} style={{ background: "none", border: "none", cursor: "pointer", color: TOKENS.muted }}><Trash2 size={14} /></button>
-                </div>
-                {s.topic && <div style={{ fontFamily: UI_FONT, fontSize: 11, color: TOKENS.accent, fontWeight: 700, margin: "4px 0" }}>{s.topic}</div>}
-                <div style={{ fontFamily: BODY_FONT, fontSize: 14.5, color: TOKENS.ink, whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{s.solutionText}</div>
-                <div style={{ fontFamily: UI_FONT, fontSize: 11, color: TOKENS.muted, marginTop: 8 }}>
-                  {s.submittedBy && `— ${s.submittedBy}`} {new Date(s.date).toLocaleDateString()}
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function Programs({ programs, setPrograms }) {
-  const [form, setForm] = useState({ name: "", model: "", description: "", code: "", submittedBy: "" });
-  const [filter, setFilter] = useState("");
-  const [copiedId, setCopiedId] = useState(null);
-
-  const add = async () => {
-    if (!form.name.trim() || !form.description.trim()) return;
-    const entry = { id: uid(), ...form, date: new Date().toISOString() };
-    const next = [entry, ...programs];
-    setPrograms(next);
-    await saveList(K.programs, next);
-    setForm({ name: "", model: "", description: "", code: "", submittedBy: "" });
-  };
-
-  const remove = async (id) => {
-    const next = programs.filter((p) => p.id !== id);
-    setPrograms(next);
-    await saveList(K.programs, next);
-  };
-
-  const copyCode = async (p) => {
-    try {
-      await navigator.clipboard.writeText(p.code || "");
-      setCopiedId(p.id);
-      setTimeout(() => setCopiedId(null), 1500);
-    } catch {
-      // clipboard may be unavailable; silently ignore
-    }
-  };
-
-  const filtered = programs.filter((p) =>
-    (p.name + p.model + p.description).toLowerCase().includes(filter.toLowerCase())
-  );
-
-  return (
-    <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 20 }}>
-      <Card>
-        <div style={{ fontFamily: UI_FONT, fontWeight: 700, fontSize: 13, marginBottom: 12, color: TOKENS.ink }}>Add a calculator program</div>
-        <Field label="Program name"><input style={inputStyle} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. QUADSOLV" /></Field>
-        <Field label="Calculator model"><input style={inputStyle} value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} placeholder="e.g. TI-84 Plus CE" /></Field>
-        <Field label="What it does">
-          <textarea style={{ ...inputStyle, minHeight: 70 }} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Explain what problem it solves, what inputs it needs, and what it outputs..." />
-        </Field>
-        <Field label="Code (optional) or a link to it">
-          <textarea style={{ ...inputStyle, minHeight: 90, fontFamily: DISPLAY_FONT, fontSize: 12.5 }} value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} placeholder="Paste the program source, or a link to where it's stored..." />
-        </Field>
-        <Field label="Your name"><input style={inputStyle} value={form.submittedBy} onChange={(e) => setForm({ ...form, submittedBy: e.target.value })} placeholder="e.g. Alex" /></Field>
-        <Button onClick={add} style={{ width: "100%", justifyContent: "center" }}><Plus size={14} /> Add program</Button>
-      </Card>
-
-      <div>
-        <div style={{ position: "relative", marginBottom: 14 }}>
-          <Search size={15} color={TOKENS.muted} style={{ position: "absolute", left: 10, top: 10 }} />
-          <input style={{ ...inputStyle, paddingLeft: 32 }} placeholder="Search programs..." value={filter} onChange={(e) => setFilter(e.target.value)} />
-        </div>
-        {filtered.length === 0 ? (
-          <Empty text={programs.length === 0 ? "No calculator programs logged yet. Add one for every program the team relies on, so nobody's stuck wondering what a cryptic program name does." : "No programs match that search."} />
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {filtered.map((p) => (
-              <Card key={p.id}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                  <div>
-                    <div style={{ fontFamily: DISPLAY_FONT, fontSize: 15, color: TOKENS.primary, fontWeight: 700 }}>{p.name}</div>
-                    {p.model && (
-                      <span style={{ fontFamily: UI_FONT, fontSize: 10, fontWeight: 700, color: TOKENS.muted, background: TOKENS.bg, border: `1px solid ${TOKENS.grid}`, borderRadius: 999, padding: "2px 8px", display: "inline-block", marginTop: 4 }}>
-                        {p.model}
-                      </span>
-                    )}
-                  </div>
-                  <button onClick={() => remove(p.id)} style={{ background: "none", border: "none", cursor: "pointer", color: TOKENS.muted }}><Trash2 size={14} /></button>
-                </div>
-                <div style={{ fontFamily: BODY_FONT, fontSize: 14, color: TOKENS.ink, marginTop: 8, lineHeight: 1.5 }}>{p.description}</div>
-                {p.code && (
-                  <div style={{ position: "relative", marginTop: 10 }}>
-                    <pre
-                      style={{
-                        fontFamily: DISPLAY_FONT,
-                        fontSize: 12.5,
-                        color: TOKENS.ink,
-                        background: TOKENS.bg,
-                        border: `1px solid ${TOKENS.grid}`,
-                        borderRadius: 8,
-                        padding: "10px 12px",
-                        margin: 0,
-                        whiteSpace: "pre-wrap",
-                        wordBreak: "break-word",
-                        maxHeight: 220,
-                        overflowY: "auto",
-                      }}
-                    >
-                      {p.code}
-                    </pre>
-                    <button
-                      onClick={() => copyCode(p)}
-                      title="Copy code"
-                      style={{ position: "absolute", top: 6, right: 6, background: TOKENS.paper, border: `1px solid ${TOKENS.grid}`, borderRadius: 6, padding: 5, cursor: "pointer", color: copiedId === p.id ? TOKENS.primary : TOKENS.muted, display: "flex" }}
-                    >
-                      {copiedId === p.id ? <Check size={13} /> : <Copy size={13} />}
-                    </button>
-                  </div>
-                )}
-                <div style={{ fontFamily: UI_FONT, fontSize: 11, color: TOKENS.muted, marginTop: 8 }}>
-                  {p.submittedBy && `— ${p.submittedBy}`} {new Date(p.date).toLocaleDateString()}
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function MeetCalendar({ meets, setMeets }) {
-  const [form, setForm] = useState({ name: "", date: "", location: "", regDeadline: "", cost: "", status: "Planned" });
-
-  const add = async () => {
-    if (!form.name.trim() || !form.date) return;
-    const entry = { id: uid(), ...form };
-    const next = [...meets, entry];
-    setMeets(next);
-    await saveList(K.meets, next);
-    setForm({ name: "", date: "", location: "", regDeadline: "", cost: "", status: "Planned" });
-  };
-
-  const remove = async (id) => {
-    const next = meets.filter((m) => m.id !== id);
-    setMeets(next);
-    await saveList(K.meets, next);
-  };
-
-  const sorted = [...meets].sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  return (
-    <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 20 }}>
-      <Card>
-        <div style={{ fontFamily: UI_FONT, fontWeight: 700, fontSize: 13, marginBottom: 12, color: TOKENS.ink }}>Add a meet</div>
-        <Field label="Name"><input style={inputStyle} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. District Invitational" /></Field>
-        <Field label="Date"><input type="date" style={inputStyle} value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></Field>
-        <Field label="Location"><input style={inputStyle} value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="e.g. Liberty Hill HS" /></Field>
-        <Field label="Registration deadline"><input type="date" style={inputStyle} value={form.regDeadline} onChange={(e) => setForm({ ...form, regDeadline: e.target.value })} /></Field>
-        <Field label="Cost"><input style={inputStyle} value={form.cost} onChange={(e) => setForm({ ...form, cost: e.target.value })} placeholder="e.g. $15/student" /></Field>
-        <Field label="Status">
-          <select style={inputStyle} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-            <option>Planned</option>
-            <option>Registered</option>
-            <option>Confirmed</option>
-            <option>Completed</option>
-          </select>
-        </Field>
-        <Button onClick={add} style={{ width: "100%", justifyContent: "center" }}><Plus size={14} /> Add to calendar</Button>
-      </Card>
-
-      <div>
-        {sorted.length === 0 ? (
-          <Empty text="No meets on the calendar yet. Add every invitational and competition as you hear about it, so nothing gets missed." />
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {sorted.map((m) => {
-              const d = daysUntil(m.date);
-              const past = d < 0;
-              return (
-                <Card key={m.id} style={{ opacity: past ? 0.55 : 1 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                    <div>
-                      <div style={{ fontFamily: DISPLAY_FONT, fontSize: 15, fontWeight: 700, color: TOKENS.ink }}>{m.name}</div>
-                      <div style={{ display: "flex", gap: 14, marginTop: 6, flexWrap: "wrap", fontFamily: UI_FONT, fontSize: 12, color: TOKENS.muted }}>
-                        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={12} /> {fmtDate(m.date)}</span>
-                        {m.location && <span style={{ display: "flex", alignItems: "center", gap: 4 }}><MapPin size={12} /> {m.location}</span>}
-                        {m.cost && <span>{m.cost}</span>}
-                      </div>
-                      {m.regDeadline && (
-                        <div style={{ fontFamily: UI_FONT, fontSize: 11, color: TOKENS.flag, marginTop: 4 }}>
-                          Register by {fmtDate(m.regDeadline)}
-                        </div>
-                      )}
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
-                      {!past && (
-                        <div style={{ fontFamily: DISPLAY_FONT, fontSize: 12, fontWeight: 700, color: TOKENS.primary }}>
-                          {d === 0 ? "Today" : `${d}d away`}
-                        </div>
-                      )}
-                      <span style={{ fontFamily: UI_FONT, fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 999, background: TOKENS.bg, color: TOKENS.primary, border: `1px solid ${TOKENS.grid}` }}>
-                        {m.status}
-                      </span>
-                      <button onClick={() => remove(m.id)} style={{ background: "none", border: "none", cursor: "pointer", color: TOKENS.muted }}><Trash2 size={13} /></button>
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function Questions({ questions, setQuestions }) {
-  const [form, setForm] = useState({ text: "", topic: "", askedBy: "" });
-  const [replyDrafts, setReplyDrafts] = useState({});
-
-  const add = async () => {
-    if (!form.text.trim()) return;
-    const entry = { id: uid(), ...form, responses: [], resolved: false, date: new Date().toISOString() };
-    const next = [entry, ...questions];
-    setQuestions(next);
-    await saveList(K.questions, next);
-    setForm({ text: "", topic: "", askedBy: "" });
-  };
-
-  const submitReply = async (id) => {
-    const draft = replyDrafts[id];
-    if (!draft || !draft.text?.trim()) return;
-    const reply = { id: uid(), text: draft.text, by: draft.by || "Anonymous", date: new Date().toISOString() };
-    const next = questions.map((q) => q.id === id ? { ...q, responses: [...(q.responses || []), reply] } : q);
-    setQuestions(next);
-    await saveList(K.questions, next);
-    setReplyDrafts({ ...replyDrafts, [id]: { text: "", by: draft.by || "" } });
-  };
-
-  const toggleResolved = async (id) => {
-    const next = questions.map((q) => q.id === id ? { ...q, resolved: !q.resolved } : q);
-    setQuestions(next);
-    await saveList(K.questions, next);
-  };
-
-  const remove = async (id) => {
-    const next = questions.filter((q) => q.id !== id);
-    setQuestions(next);
-    await saveList(K.questions, next);
-  };
-
-  const open = questions.filter((q) => !q.resolved);
-  const resolved = questions.filter((q) => q.resolved);
-
-  return (
-    <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 20 }}>
-      <Card>
-        <div style={{ fontFamily: UI_FONT, fontWeight: 700, fontSize: 13, marginBottom: 12, color: TOKENS.ink }}>Ask a question</div>
-        <Field label="Question"><textarea style={{ ...inputStyle, minHeight: 70 }} value={form.text} onChange={(e) => setForm({ ...form, text: e.target.value })} placeholder="What's tripping you up?" /></Field>
-        <Field label="Topic"><input style={inputStyle} value={form.topic} onChange={(e) => setForm({ ...form, topic: e.target.value })} placeholder="e.g. Probability" /></Field>
-        <Field label="Your name"><input style={inputStyle} value={form.askedBy} onChange={(e) => setForm({ ...form, askedBy: e.target.value })} placeholder="e.g. Sam" /></Field>
-        <Button onClick={add} style={{ width: "100%", justifyContent: "center" }}><Plus size={14} /> Add to queue</Button>
-      </Card>
-
-      <div>
-        <div style={{ fontFamily: UI_FONT, fontWeight: 700, fontSize: 13, marginBottom: 10, color: TOKENS.ink }}>Open ({open.length})</div>
-        {open.length === 0 ? (
-          <Empty text="No open questions." />
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
-            {open.map((q) => (
-              <QuestionThread
-                key={q.id}
-                q={q}
-                isResolved={false}
-                draft={replyDrafts[q.id]}
-                setDraft={(next) => setReplyDrafts({ ...replyDrafts, [q.id]: next })}
-                onToggleResolved={() => toggleResolved(q.id)}
-                onRemove={() => remove(q.id)}
-                onSubmitReply={() => submitReply(q.id)}
-              />
-            ))}
-          </div>
-        )}
-
-        <div style={{ fontFamily: UI_FONT, fontWeight: 700, fontSize: 13, marginBottom: 10, color: TOKENS.ink }}>Resolved ({resolved.length})</div>
-        {resolved.length === 0 ? (
-          <Empty text="Resolved questions will show up here." />
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {resolved.map((q) => (
-              <QuestionThread
-                key={q.id}
-                q={q}
-                isResolved={true}
-                draft={replyDrafts[q.id]}
-                setDraft={(next) => setReplyDrafts({ ...replyDrafts, [q.id]: next })}
-                onToggleResolved={() => toggleResolved(q.id)}
-                onRemove={() => remove(q.id)}
-                onSubmitReply={() => submitReply(q.id)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function QuestionThread({ q, isResolved, draft, setDraft, onToggleResolved, onRemove, onSubmitReply }) {
-  return (
-    <Card style={{ background: isResolved ? TOKENS.bg : TOKENS.paper }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <div>
-          <div style={{ fontFamily: BODY_FONT, fontSize: 14.5, color: TOKENS.ink }}>{q.text}</div>
-          <div style={{ fontFamily: UI_FONT, fontSize: 11, color: TOKENS.muted, marginTop: 2 }}>
-            {q.topic || "General"} · asked by {q.askedBy || "Anonymous"}
-            {q.responses?.length > 0 && ` · ${q.responses.length} response${q.responses.length > 1 ? "s" : ""}`}
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <button
-            onClick={onToggleResolved}
-            title={isResolved ? "Reopen" : "Mark resolved"}
-            style={{ background: "none", border: "none", cursor: "pointer", color: isResolved ? TOKENS.primary : TOKENS.muted, display: "flex" }}
-          >
-            {isResolved ? <CheckCircle2 size={16} /> : <Circle size={16} />}
-          </button>
-          <button onClick={onRemove} style={{ background: "none", border: "none", cursor: "pointer", color: TOKENS.muted, display: "flex" }}><Trash2 size={14} /></button>
-        </div>
-      </div>
-
-      {q.responses?.length > 0 && (
-        <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
-          {q.responses.map((r) => (
-            <div key={r.id} style={{ paddingLeft: 10, borderLeft: `2px solid ${TOKENS.primary}` }}>
-              <div style={{ fontFamily: BODY_FONT, fontSize: 13.5, color: TOKENS.primaryDark }}>{r.text}</div>
-              <div style={{ fontFamily: UI_FONT, fontSize: 10.5, color: TOKENS.muted, marginTop: 2 }}>
-                {r.by} · {new Date(r.date).toLocaleDateString()}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <div style={{ marginTop: 10, display: "flex", gap: 8, alignItems: "flex-start" }}>
-        <textarea
-          style={{ ...inputStyle, minHeight: 44, flex: 1 }}
-          placeholder="Add a response..."
-          value={draft?.text || ""}
-          onChange={(e) => setDraft({ ...draft, text: e.target.value })}
-        />
-      </div>
-      <div style={{ display: "flex", gap: 8, marginTop: 6, alignItems: "center" }}>
-        <input
-          style={{ ...inputStyle, maxWidth: 140 }}
-          placeholder="Your name"
-          value={draft?.by || ""}
-          onChange={(e) => setDraft({ ...draft, by: e.target.value })}
-        />
-        <Button onClick={onSubmitReply}>Respond</Button>
-      </div>
-    </Card>
-  );
-}
-
-function Chat({ chat, setChat }) {
-  const [text, setText] = useState("");
-  const [name, setName] = useState("");
-  const bottomRef = useRef(null);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chat.length]);
-
-  const send = async () => {
-    if (!text.trim()) return;
-    const msg = { id: uid(), text: text.trim(), author: name.trim() || "Anonymous", date: new Date().toISOString() };
-    const next = [...chat, msg];
-    setChat(next);
-    setText("");
-    await saveList(K.chat, next);
-  };
-
-  const onKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      send();
-    }
-  };
-
-  return (
-    <div>
-      <div style={{ display: "flex", gap: 10, marginBottom: 12, alignItems: "center" }}>
-        <span style={{ fontFamily: UI_FONT, fontSize: 12, color: TOKENS.muted }}>Chatting as</span>
-        <input
-          style={{ ...inputStyle, maxWidth: 160 }}
-          placeholder="Your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <span style={{ fontFamily: UI_FONT, fontSize: 11, color: TOKENS.muted }}>· messages refresh every few seconds</span>
-      </div>
-
-      <div
-        style={{
-          background: TOKENS.paper,
-          border: `1px solid ${TOKENS.grid}`,
-          borderRadius: 10,
-          height: 380,
-          overflowY: "auto",
-          padding: 16,
-          display: "flex",
-          flexDirection: "column",
-          gap: 10,
-        }}
-      >
-        {chat.length === 0 ? (
-          <Empty text="No messages yet — say hi, ask a quick question, or coordinate practice plans here." />
-        ) : (
-          chat.map((m) => (
-            <div key={m.id} style={{ maxWidth: "80%" }}>
-              <div style={{ display: "flex", gap: 8, alignItems: "baseline" }}>
-                <span style={{ fontFamily: UI_FONT, fontSize: 12, fontWeight: 700, color: TOKENS.primary }}>{m.author}</span>
-                <span style={{ fontFamily: UI_FONT, fontSize: 10, color: TOKENS.muted }}>
-                  {new Date(m.date).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
-                </span>
-              </div>
-              <div
-                style={{
-                  fontFamily: BODY_FONT,
-                  fontSize: 14,
-                  color: TOKENS.ink,
-                  background: TOKENS.bg,
-                  padding: "8px 12px",
-                  borderRadius: "4px 10px 10px 10px",
-                  marginTop: 3,
-                  whiteSpace: "pre-wrap",
-                }}
-              >
-                {m.text}
-              </div>
-            </div>
-          ))
-        )}
-        <div ref={bottomRef} />
-      </div>
-
-      <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-        <textarea
-          style={{ ...inputStyle, minHeight: 44, flex: 1, resize: "none" }}
-          placeholder="Type a message... (Enter to send, Shift+Enter for a new line)"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onKeyDown={onKeyDown}
-        />
-        <Button onClick={send} style={{ alignSelf: "flex-end" }}><Send size={14} /> Send</Button>
-      </div>
-    </div>
-  );
-}
-
-function Schedule({ schedule, setSchedule, scheduleSettings, setScheduleSettings }) {
+function Schedule({
+  schedule,
+  setSchedule,
+  scheduleSettings,
+  setScheduleSettings,
+}) {
   const [editingId, setEditingId] = useState(null);
-  const [editDraft, setEditDraft] = useState({ concept: "", blurb: "", category: "" });
-  const [addForm, setAddForm] = useState({ concept: "", blurb: "", category: "" });
-  const [showAdd, setShowAdd] = useState(false);
-
-  const sorted = [...schedule].sort((a, b) => a.weekNumber - b.weekNumber);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const weekRange = (weekNumber) => {
-    const start = addDays(scheduleSettings.startDate, (weekNumber - 1) * 7);
-    const end = addDays(scheduleSettings.startDate, weekNumber * 7 - 1);
-    return { start, end };
-  };
-  const isCurrent = (weekNumber) => {
-    const { start, end } = weekRange(weekNumber);
-    const s = new Date(start + "T00:00:00");
-    const e = new Date(end + "T00:00:00");
-    return today >= s && today <= e;
-  };
-
-  const updateStartDate = async (val) => {
-    const next = { ...scheduleSettings, startDate: val };
-    setScheduleSettings(next);
-    await window.storage.set(K.scheduleSettings, JSON.stringify(next), true);
-  };
+  const [editForm, setEditForm] = useState({
+    category: "",
+    concept: "",
+    blurb: "",
+  });
 
   const toggleComplete = async (id) => {
-    const next = schedule.map((w) => w.id === id ? { ...w, completed: !w.completed } : w);
+    const next = schedule.map((w) =>
+      w.id === id ? { ...w, completed: !w.completed } : w
+    );
     setSchedule(next);
     await saveList(K.schedule, next);
   };
 
+  const updateStartDate = async (e) => {
+    const val = e.target.value;
+    const next = { ...scheduleSettings, startDate: val };
+    setScheduleSettings(next);
+    localStorage.setItem(K.scheduleSettings, JSON.stringify(next));
+  };
+
   const startEdit = (w) => {
     setEditingId(w.id);
-    setEditDraft({ concept: w.concept, blurb: w.blurb, category: w.category || "" });
+    setEditForm({
+      category: w.category || "",
+      concept: w.concept || "",
+      blurb: w.blurb || "",
+    });
   };
 
   const saveEdit = async (id) => {
-    const next = schedule.map((w) => w.id === id ? { ...w, concept: editDraft.concept, blurb: editDraft.blurb, category: editDraft.category } : w);
+    const next = schedule.map((w) => (w.id === id ? { ...w, ...editForm } : w));
     setSchedule(next);
     await saveList(K.schedule, next);
     setEditingId(null);
   };
 
-  const remove = async (id) => {
-    const next = schedule.filter((w) => w.id !== id).map((w, i) => ({ ...w, weekNumber: i + 1 }));
-    setSchedule(next);
-    await saveList(K.schedule, next);
-  };
-
-  const addWeek = async () => {
-    if (!addForm.concept.trim()) return;
-    const entry = { id: uid(), weekNumber: schedule.length + 1, concept: addForm.concept, blurb: addForm.blurb, category: addForm.category, completed: false };
-    const next = [...schedule, entry];
-    setSchedule(next);
-    await saveList(K.schedule, next);
-    setAddForm({ concept: "", blurb: "", category: "" });
-    setShowAdd(false);
-  };
-
   return (
     <div>
-      <Card style={{ marginBottom: 18, display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-        <div style={{ fontFamily: UI_FONT, fontSize: 13, fontWeight: 700, color: TOKENS.ink }}>Week 1 starts</div>
-        <input type="date" style={{ ...inputStyle, maxWidth: 170 }} value={scheduleSettings.startDate} onChange={(e) => updateStartDate(e.target.value)} />
-        <div style={{ fontFamily: UI_FONT, fontSize: 12, color: TOKENS.muted, flex: 1 }}>
-          One concept a week, seeded with a standard progression of UIL Mathematics topics — edit, reorder, or add your own anytime.
+      <Card
+        style={{
+          marginBottom: 20,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontFamily: UI_FONT,
+              fontWeight: 700,
+              fontSize: 14,
+              color: TOKENS.ink,
+            }}
+          >
+            24-Week UIL Curriculum Schedule
+          </div>
+          <div
+            style={{ fontFamily: UI_FONT, fontSize: 12, color: TOKENS.muted }}
+          >
+            Tracks progress across key contest areas. Click the pencil icon on
+            any week to edit it.
+          </div>
         </div>
-        <Button onClick={() => setShowAdd((v) => !v)}><Plus size={14} /> Add week</Button>
+        <Field label="Start Date">
+          <input
+            type="date"
+            style={inputStyle}
+            value={scheduleSettings.startDate}
+            onChange={updateStartDate}
+          />
+        </Field>
       </Card>
 
-      {showAdd && (
-        <Card style={{ marginBottom: 18 }}>
-          <div style={{ fontFamily: UI_FONT, fontWeight: 700, fontSize: 13, marginBottom: 10, color: TOKENS.ink }}>
-            New week (Week {schedule.length + 1})
-          </div>
-          <Field label="Concept"><input style={inputStyle} value={addForm.concept} onChange={(e) => setAddForm({ ...addForm, concept: e.target.value })} placeholder="e.g. Vectors" /></Field>
-          <Field label="Short description"><input style={inputStyle} value={addForm.blurb} onChange={(e) => setAddForm({ ...addForm, blurb: e.target.value })} placeholder="One line on what it covers" /></Field>
-          <Field label="Category"><input style={inputStyle} value={addForm.category} onChange={(e) => setAddForm({ ...addForm, category: e.target.value })} placeholder="e.g. Algebra II" /></Field>
-          <div style={{ display: "flex", gap: 8 }}>
-            <Button onClick={addWeek}>Add</Button>
-            <Button variant="ghost" onClick={() => setShowAdd(false)}>Cancel</Button>
-          </div>
-        </Card>
-      )}
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {schedule.map((w) => {
+          const startDate = addDays(
+            scheduleSettings.startDate,
+            (w.weekNumber - 1) * 7
+          );
+          const isEditing = editingId === w.id;
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {sorted.map((w) => {
-          const { start, end } = weekRange(w.weekNumber);
-          const current = isCurrent(w.weekNumber);
-          const editing = editingId === w.id;
           return (
             <Card
               key={w.id}
               style={{
                 display: "flex",
-                gap: 14,
                 alignItems: "flex-start",
-                border: current ? `1.5px solid ${TOKENS.primary}` : `1px solid ${TOKENS.grid}`,
-                background: w.completed ? TOKENS.bg : TOKENS.paper,
+                gap: 14,
+                background: w.completed ? "#F5F8F4" : TOKENS.paper,
               }}
             >
-              <div style={{ minWidth: 46, textAlign: "center" }}>
-                <div style={{ fontFamily: DISPLAY_FONT, fontSize: 11, color: TOKENS.muted }}>WK</div>
-                <div style={{ fontFamily: DISPLAY_FONT, fontSize: 20, fontWeight: 700, color: current ? TOKENS.primary : TOKENS.ink }}>{w.weekNumber}</div>
-              </div>
+              <button
+                onClick={() => toggleComplete(w.id)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: w.completed ? TOKENS.primary : TOKENS.muted,
+                  marginTop: 2,
+                }}
+              >
+                {w.completed ? (
+                  <CheckCircle2 size={20} />
+                ) : (
+                  <Circle size={20} />
+                )}
+              </button>
+
               <div style={{ flex: 1 }}>
-                {editing ? (
-                  <div>
-                    <input style={{ ...inputStyle, marginBottom: 6 }} value={editDraft.concept} onChange={(e) => setEditDraft({ ...editDraft, concept: e.target.value })} placeholder="Concept" />
-                    <input style={{ ...inputStyle, marginBottom: 6 }} value={editDraft.blurb} onChange={(e) => setEditDraft({ ...editDraft, blurb: e.target.value })} placeholder="Description" />
-                    <input style={inputStyle} value={editDraft.category} onChange={(e) => setEditDraft({ ...editDraft, category: e.target.value })} placeholder="Category (e.g. Algebra II)" />
-                    <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                      <Button onClick={() => saveEdit(w.id)}>Save</Button>
-                      <Button variant="ghost" onClick={() => setEditingId(null)}>Cancel</Button>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    alignItems: "center",
+                    marginBottom: 4,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: DISPLAY_FONT,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: TOKENS.accent,
+                    }}
+                  >
+                    WEEK {w.weekNumber}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: UI_FONT,
+                      fontSize: 11,
+                      color: TOKENS.muted,
+                    }}
+                  >
+                    ({fmtDate(startDate)})
+                  </span>
+                </div>
+
+                {isEditing ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 8,
+                      marginTop: 6,
+                    }}
+                  >
+                    <Field label="Category">
+                      <input
+                        style={inputStyle}
+                        value={editForm.category}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, category: e.target.value })
+                        }
+                        placeholder="e.g. Algebra I"
+                      />
+                    </Field>
+                    <Field label="Concept Title">
+                      <input
+                        style={inputStyle}
+                        value={editForm.concept}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, concept: e.target.value })
+                        }
+                        placeholder="Topic title"
+                      />
+                    </Field>
+                    <Field label="Description / Topics Covered">
+                      <textarea
+                        style={{ ...inputStyle, minHeight: 60 }}
+                        value={editForm.blurb}
+                        onChange={(e) =>
+                          setEditForm({ ...editForm, blurb: e.target.value })
+                        }
+                        placeholder="Brief breakdown"
+                      />
+                    </Field>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <Button
+                        onClick={() => saveEdit(w.id)}
+                        style={{ padding: "4px 10px", fontSize: 12 }}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => setEditingId(null)}
+                        style={{ padding: "4px 10px", fontSize: 12 }}
+                      >
+                        Cancel
+                      </Button>
                     </div>
                   </div>
                 ) : (
                   <>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                      {w.category && (
-                        <span style={{ fontFamily: UI_FONT, fontSize: 10, fontWeight: 700, color: TOKENS.primary, background: TOKENS.bg, border: `1px solid ${TOKENS.grid}`, borderRadius: 999, padding: "2px 8px" }}>
-                          {w.category.toUpperCase()}
-                        </span>
-                      )}
-                      <div style={{ fontFamily: DISPLAY_FONT, fontSize: 15, fontWeight: 700, color: TOKENS.ink, textDecoration: w.completed ? "line-through" : "none" }}>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 8 }}
+                    >
+                      <div
+                        style={{
+                          fontFamily: DISPLAY_FONT,
+                          fontSize: 16,
+                          fontWeight: 700,
+                          color: TOKENS.ink,
+                          textDecoration: w.completed ? "line-through" : "none",
+                        }}
+                      >
                         {w.concept}
                       </div>
-                      {current && (
-                        <span style={{ fontFamily: UI_FONT, fontSize: 10, fontWeight: 700, color: "#fff", background: TOKENS.primary, borderRadius: 999, padding: "2px 8px" }}>
-                          THIS WEEK
+                      {w.category && (
+                        <span
+                          style={{
+                            fontFamily: UI_FONT,
+                            fontSize: 10,
+                            background: TOKENS.bg,
+                            border: `1px solid ${TOKENS.grid}`,
+                            padding: "1px 6px",
+                            borderRadius: 4,
+                          }}
+                        >
+                          {w.category}
                         </span>
                       )}
                     </div>
-                    <div style={{ fontFamily: BODY_FONT, fontSize: 13.5, color: TOKENS.muted, marginTop: 3 }}>{w.blurb}</div>
-                    <div style={{ fontFamily: UI_FONT, fontSize: 11, color: TOKENS.muted, marginTop: 6 }}>{fmtDate(start)} – {fmtDate(end)}</div>
+                    <div
+                      style={{
+                        fontFamily: BODY_FONT,
+                        fontSize: 13,
+                        color: TOKENS.muted,
+                        marginTop: 4,
+                      }}
+                    >
+                      {w.blurb}
+                    </div>
                   </>
                 )}
               </div>
-              {!editing && (
-                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                  <button onClick={() => toggleComplete(w.id)} title={w.completed ? "Mark not taught" : "Mark taught"} style={{ background: "none", border: "none", cursor: "pointer", color: w.completed ? TOKENS.primary : TOKENS.muted }}>
-                    {w.completed ? <CheckCircle2 size={17} /> : <Circle size={17} />}
-                  </button>
-                  <button onClick={() => startEdit(w)} style={{ background: "none", border: "none", cursor: "pointer", color: TOKENS.muted }}><Pencil size={14} /></button>
-                  <button onClick={() => remove(w.id)} style={{ background: "none", border: "none", cursor: "pointer", color: TOKENS.muted }}><Trash2 size={14} /></button>
-                </div>
+
+              {!isEditing && (
+                <button
+                  onClick={() => startEdit(w)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: TOKENS.muted,
+                    padding: 4,
+                  }}
+                >
+                  <Pencil size={15} />
+                </button>
               )}
             </Card>
           );
@@ -1123,59 +1084,684 @@ function Schedule({ schedule, setSchedule, scheduleSettings, setScheduleSettings
   );
 }
 
-function Concepts({ concepts, setConcepts }) {
-  const [form, setForm] = useState({ topic: "", explanation: "", addedBy: "" });
-  const [filter, setFilter] = useState("");
+function Solutions({ solutions, setSolutions }) {
+  const [form, setForm] = useState({
+    competition: "",
+    topic: "",
+    problemNum: "",
+    solutionText: "",
+    submittedBy: "",
+  });
 
   const add = async () => {
-    if (!form.topic.trim() || !form.explanation.trim()) return;
+    if (!form.solutionText.trim() || !form.competition.trim()) return;
     const entry = { id: uid(), ...form, date: new Date().toISOString() };
-    const next = [entry, ...concepts];
-    setConcepts(next);
-    await saveList(K.concepts, next);
-    setForm({ topic: "", explanation: "", addedBy: "" });
+    const next = [entry, ...solutions];
+    setSolutions(next);
+    await saveList(K.solutions, next);
+    setForm({
+      competition: "",
+      topic: "",
+      problemNum: "",
+      solutionText: "",
+      submittedBy: "",
+    });
   };
 
   const remove = async (id) => {
-    const next = concepts.filter((c) => c.id !== id);
-    setConcepts(next);
-    await saveList(K.concepts, next);
+    const next = solutions.filter((s) => s.id !== id);
+    setSolutions(next);
+    await saveList(K.solutions, next);
   };
-
-  const filtered = concepts.filter((c) => (c.topic + c.explanation).toLowerCase().includes(filter.toLowerCase()));
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 20 }}>
       <Card>
-        <div style={{ fontFamily: UI_FONT, fontWeight: 700, fontSize: 13, marginBottom: 12, color: TOKENS.ink }}>Add a concept note</div>
-        <Field label="Topic / concept"><input style={inputStyle} value={form.topic} onChange={(e) => setForm({ ...form, topic: e.target.value })} placeholder="e.g. Sum of geometric series" /></Field>
-        <Field label="Explanation"><textarea style={{ ...inputStyle, minHeight: 110 }} value={form.explanation} onChange={(e) => setForm({ ...form, explanation: e.target.value })} placeholder="Explain it the way you'd want it explained to you..." /></Field>
-        <Field label="Your name"><input style={inputStyle} value={form.addedBy} onChange={(e) => setForm({ ...form, addedBy: e.target.value })} placeholder="e.g. Priya" /></Field>
-        <Button onClick={add} style={{ width: "100%", justifyContent: "center" }}><Plus size={14} /> Add note</Button>
-      </Card>
-
-      <div>
-        <div style={{ position: "relative", marginBottom: 14 }}>
-          <Search size={15} color={TOKENS.muted} style={{ position: "absolute", left: 10, top: 10 }} />
-          <input style={{ ...inputStyle, paddingLeft: 32 }} placeholder="Search concepts..." value={filter} onChange={(e) => setFilter(e.target.value)} />
+        <div
+          style={{
+            fontFamily: UI_FONT,
+            fontWeight: 700,
+            fontSize: 13,
+            marginBottom: 12,
+            color: TOKENS.ink,
+          }}
+        >
+          Add a solution
         </div>
-        {filtered.length === 0 ? (
-          <Empty text={concepts.length === 0 ? "No concept notes yet. When you explain something to a teammate, jot it down here so you only explain it once." : "No concepts match that search."} />
+        <Field label="Competition">
+          <input
+            style={inputStyle}
+            value={form.competition}
+            onChange={(e) => setForm({ ...form, competition: e.target.value })}
+            placeholder="e.g. TMSCA Regional"
+          />
+        </Field>
+        <Field label="Topic">
+          <input
+            style={inputStyle}
+            value={form.topic}
+            onChange={(e) => setForm({ ...form, topic: e.target.value })}
+            placeholder="e.g. Sequences"
+          />
+        </Field>
+        <Field label="Problem #">
+          <input
+            style={inputStyle}
+            value={form.problemNum}
+            onChange={(e) => setForm({ ...form, problemNum: e.target.value })}
+            placeholder="e.g. #24"
+          />
+        </Field>
+        <Field label="Solution">
+          <textarea
+            style={{ ...inputStyle, minHeight: 90 }}
+            value={form.solutionText}
+            onChange={(e) => setForm({ ...form, solutionText: e.target.value })}
+            placeholder="Write solution..."
+          />
+        </Field>
+        <Field label="Your Name">
+          <input
+            style={inputStyle}
+            value={form.submittedBy}
+            onChange={(e) => setForm({ ...form, submittedBy: e.target.value })}
+            placeholder="e.g. Jordan"
+          />
+        </Field>
+        <Button
+          onClick={add}
+          style={{ width: "100%", justifyContent: "center" }}
+        >
+          <Plus size={14} /> Add to bank
+        </Button>
+      </Card>
+      <div>
+        {solutions.length === 0 ? (
+          <Empty text="No solutions logged yet." />
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {filtered.map((c) => (
-              <Card key={c.id}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                  <div style={{ fontFamily: DISPLAY_FONT, fontSize: 14, fontWeight: 700, color: TOKENS.primary }}>{c.topic}</div>
-                  <button onClick={() => remove(c.id)} style={{ background: "none", border: "none", cursor: "pointer", color: TOKENS.muted }}><Trash2 size={14} /></button>
+          solutions.map((s) => (
+            <Card key={s.id} style={{ marginBottom: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div
+                  style={{
+                    fontFamily: DISPLAY_FONT,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: TOKENS.primary,
+                  }}
+                >
+                  {s.competition} {s.problemNum && `· ${s.problemNum}`}
                 </div>
-                <div style={{ fontFamily: BODY_FONT, fontSize: 14.5, color: TOKENS.ink, marginTop: 6, whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{c.explanation}</div>
-                <div style={{ fontFamily: UI_FONT, fontSize: 11, color: TOKENS.muted, marginTop: 8 }}>{c.addedBy && `— ${c.addedBy}`}</div>
-              </Card>
-            ))}
-          </div>
+                <button
+                  onClick={() => remove(s.id)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: TOKENS.muted,
+                  }}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+              {s.topic && (
+                <div
+                  style={{
+                    fontFamily: UI_FONT,
+                    fontSize: 11,
+                    color: TOKENS.accent,
+                    fontWeight: 700,
+                  }}
+                >
+                  {s.topic}
+                </div>
+              )}
+              <div
+                style={{ fontFamily: BODY_FONT, fontSize: 14, marginTop: 4 }}
+              >
+                {s.solutionText}
+              </div>
+            </Card>
+          ))
         )}
       </div>
     </div>
+  );
+}
+
+function Programs({ programs, setPrograms }) {
+  const [form, setForm] = useState({
+    name: "",
+    model: "",
+    description: "",
+    code: "",
+    submittedBy: "",
+  });
+
+  const add = async () => {
+    if (!form.name.trim() || !form.description.trim()) return;
+    const entry = { id: uid(), ...form, date: new Date().toISOString() };
+    const next = [entry, ...programs];
+    setPrograms(next);
+    await saveList(K.programs, next);
+    setForm({
+      name: "",
+      model: "",
+      description: "",
+      code: "",
+      submittedBy: "",
+    });
+  };
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 20 }}>
+      <Card>
+        <div
+          style={{
+            fontFamily: UI_FONT,
+            fontWeight: 700,
+            fontSize: 13,
+            marginBottom: 12,
+            color: TOKENS.ink,
+          }}
+        >
+          Add a calculator program
+        </div>
+        <Field label="Program Name">
+          <input
+            style={inputStyle}
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            placeholder="e.g. QUADSOLV"
+          />
+        </Field>
+        <Field label="Calculator Model">
+          <input
+            style={inputStyle}
+            value={form.model}
+            onChange={(e) => setForm({ ...form, model: e.target.value })}
+            placeholder="e.g. TI-84 Plus CE"
+          />
+        </Field>
+        <Field label="Description">
+          <textarea
+            style={{ ...inputStyle, minHeight: 70 }}
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            placeholder="What problem it solves..."
+          />
+        </Field>
+        <Field label="Code">
+          <textarea
+            style={{ ...inputStyle, minHeight: 80, fontFamily: DISPLAY_FONT }}
+            value={form.code}
+            onChange={(e) => setForm({ ...form, code: e.target.value })}
+            placeholder="Source code..."
+          />
+        </Field>
+        <Button
+          onClick={add}
+          style={{ width: "100%", justifyContent: "center" }}
+        >
+          <Plus size={14} /> Add program
+        </Button>
+      </Card>
+      <div>
+        {programs.length === 0 ? (
+          <Empty text="No programs added yet." />
+        ) : (
+          programs.map((p) => (
+            <Card key={p.id} style={{ marginBottom: 10 }}>
+              <div
+                style={{
+                  fontFamily: DISPLAY_FONT,
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: TOKENS.primary,
+                }}
+              >
+                {p.name}
+              </div>
+              <div
+                style={{
+                  fontFamily: UI_FONT,
+                  fontSize: 12,
+                  color: TOKENS.muted,
+                }}
+              >
+                {p.model}
+              </div>
+              <div
+                style={{ fontFamily: BODY_FONT, fontSize: 14, marginTop: 6 }}
+              >
+                {p.description}
+              </div>
+              {p.code && (
+                <pre
+                  style={{
+                    background: TOKENS.bg,
+                    padding: 10,
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontFamily: DISPLAY_FONT,
+                    marginTop: 8,
+                  }}
+                >
+                  {p.code}
+                </pre>
+              )}
+            </Card>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function MeetCalendar({ meets, setMeets }) {
+  const [form, setForm] = useState({
+    name: "",
+    date: "",
+    location: "",
+    regDeadline: "",
+  });
+
+  const add = async () => {
+    if (!form.name.trim() || !form.date) return;
+    const entry = { id: uid(), ...form };
+    const next = [...meets, entry];
+    setMeets(next);
+    await saveList(K.meets, next);
+    setForm({ name: "", date: "", location: "", regDeadline: "" });
+  };
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 20 }}>
+      <Card>
+        <div
+          style={{
+            fontFamily: UI_FONT,
+            fontWeight: 700,
+            fontSize: 13,
+            marginBottom: 12,
+            color: TOKENS.ink,
+          }}
+        >
+          Add a meet
+        </div>
+        <Field label="Name">
+          <input
+            style={inputStyle}
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            placeholder="e.g. District Invitational"
+          />
+        </Field>
+        <Field label="Date">
+          <input
+            type="date"
+            style={inputStyle}
+            value={form.date}
+            onChange={(e) => setForm({ ...form, date: e.target.value })}
+          />
+        </Field>
+        <Field label="Registration deadline">
+          <input
+            type="date"
+            style={inputStyle}
+            value={form.regDeadline}
+            onChange={(e) => setForm({ ...form, regDeadline: e.target.value })}
+          />
+        </Field>
+        <Button
+          onClick={add}
+          style={{ width: "100%", justifyContent: "center" }}
+        >
+          <Plus size={14} /> Add meet
+        </Button>
+      </Card>
+      <div>
+        {meets.length === 0 ? (
+          <Empty text="No meets added yet." />
+        ) : (
+          meets.map((m) => (
+            <Card key={m.id} style={{ marginBottom: 10 }}>
+              <div
+                style={{
+                  fontFamily: DISPLAY_FONT,
+                  fontSize: 16,
+                  fontWeight: 700,
+                }}
+              >
+                {m.name}
+              </div>
+              <div
+                style={{
+                  fontFamily: UI_FONT,
+                  fontSize: 12,
+                  color: TOKENS.muted,
+                }}
+              >
+                {fmtDate(m.date)}
+              </div>
+            </Card>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Questions({ questions, setQuestions }) {
+  const [form, setForm] = useState({ text: "", topic: "", askedBy: "" });
+
+  const add = async () => {
+    if (!form.text.trim()) return;
+    const entry = {
+      id: uid(),
+      ...form,
+      resolved: false,
+      date: new Date().toISOString(),
+    };
+    const next = [entry, ...questions];
+    setQuestions(next);
+    await saveList(K.questions, next);
+    setForm({ text: "", topic: "", askedBy: "" });
+  };
+
+  const toggleResolved = async (id) => {
+    const next = questions.map((q) =>
+      q.id === id ? { ...q, resolved: !q.resolved } : q
+    );
+    setQuestions(next);
+    await saveList(K.questions, next);
+  };
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 20 }}>
+      <Card>
+        <div
+          style={{
+            fontFamily: UI_FONT,
+            fontWeight: 700,
+            fontSize: 13,
+            marginBottom: 12,
+            color: TOKENS.ink,
+          }}
+        >
+          Ask a question
+        </div>
+        <Field label="Question">
+          <textarea
+            style={{ ...inputStyle, minHeight: 80 }}
+            value={form.text}
+            onChange={(e) => setForm({ ...form, text: e.target.value })}
+            placeholder="What problem are you stuck on?"
+          />
+        </Field>
+        <Field label="Topic">
+          <input
+            style={inputStyle}
+            value={form.topic}
+            onChange={(e) => setForm({ ...form, topic: e.target.value })}
+            placeholder="e.g. Trigonometry"
+          />
+        </Field>
+        <Field label="Your Name">
+          <input
+            style={inputStyle}
+            value={form.askedBy}
+            onChange={(e) => setForm({ ...form, askedBy: e.target.value })}
+            placeholder="e.g. Alex"
+          />
+        </Field>
+        <Button
+          onClick={add}
+          style={{ width: "100%", justifyContent: "center" }}
+        >
+          <Plus size={14} /> Submit Question
+        </Button>
+      </Card>
+      <div>
+        {questions.length === 0 ? (
+          <Empty text="No questions right now." />
+        ) : (
+          questions.map((q) => (
+            <Card
+              key={q.id}
+              style={{
+                marginBottom: 10,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    fontFamily: BODY_FONT,
+                    fontSize: 15,
+                    textDecoration: q.resolved ? "line-through" : "none",
+                  }}
+                >
+                  {q.text}
+                </div>
+                <div
+                  style={{
+                    fontFamily: UI_FONT,
+                    fontSize: 11,
+                    color: TOKENS.muted,
+                    marginTop: 4,
+                  }}
+                >
+                  {q.topic || "General"} · asked by {q.askedBy || "Anonymous"}
+                </div>
+              </div>
+              <Button
+                variant={q.resolved ? "ghost" : "primary"}
+                onClick={() => toggleResolved(q.id)}
+              >
+                {q.resolved ? "Reopen" : "Resolve"}
+              </Button>
+            </Card>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Concepts({ concepts, setConcepts }) {
+  const [form, setForm] = useState({
+    title: "",
+    category: "",
+    content: "",
+    author: "",
+  });
+
+  const add = async () => {
+    if (!form.title.trim() || !form.content.trim()) return;
+    const entry = { id: uid(), ...form, date: new Date().toISOString() };
+    const next = [entry, ...concepts];
+    setConcepts(next);
+    await saveList(K.concepts, next);
+    setForm({ title: "", category: "", content: "", author: "" });
+  };
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 20 }}>
+      <Card>
+        <div
+          style={{
+            fontFamily: UI_FONT,
+            fontWeight: 700,
+            fontSize: 13,
+            marginBottom: 12,
+            color: TOKENS.ink,
+          }}
+        >
+          Add Concept Note
+        </div>
+        <Field label="Title">
+          <input
+            style={inputStyle}
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            placeholder="e.g. Synthetic Division Shortcut"
+          />
+        </Field>
+        <Field label="Category">
+          <input
+            style={inputStyle}
+            value={form.category}
+            onChange={(e) => setForm({ ...form, category: e.target.value })}
+            placeholder="e.g. Algebra II"
+          />
+        </Field>
+        <Field label="Notes / Formulas">
+          <textarea
+            style={{ ...inputStyle, minHeight: 90 }}
+            value={form.content}
+            onChange={(e) => setForm({ ...form, content: e.target.value })}
+            placeholder="Key formulas or shortcuts..."
+          />
+        </Field>
+        <Button
+          onClick={add}
+          style={{ width: "100%", justifyContent: "center" }}
+        >
+          <Plus size={14} /> Save Note
+        </Button>
+      </Card>
+      <div>
+        {concepts.length === 0 ? (
+          <Empty text="No concept notes logged yet." />
+        ) : (
+          concepts.map((c) => (
+            <Card key={c.id} style={{ marginBottom: 10 }}>
+              <div
+                style={{
+                  fontFamily: DISPLAY_FONT,
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: TOKENS.primary,
+                }}
+              >
+                {c.title}
+              </div>
+              <div
+                style={{
+                  fontFamily: UI_FONT,
+                  fontSize: 11,
+                  color: TOKENS.accent,
+                  fontWeight: 700,
+                  margin: "2px 0 6px",
+                }}
+              >
+                {c.category}
+              </div>
+              <div style={{ fontFamily: BODY_FONT, fontSize: 14 }}>
+                {c.content}
+              </div>
+            </Card>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Chat({ chat, setChat }) {
+  const [text, setText] = useState("");
+  const [sender, setSender] = useState("");
+
+  const send = async () => {
+    if (!text.trim()) return;
+    const msg = {
+      id: uid(),
+      text,
+      sender: sender || "Anonymous",
+      timestamp: new Date().toISOString(),
+    };
+    const next = [...chat, msg];
+    setChat(next);
+    await saveList(K.chat, next);
+    setText("");
+  };
+
+  return (
+    <Card style={{ display: "flex", flexDirection: "column", height: 450 }}>
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+          paddingBottom: 10,
+        }}
+      >
+        {chat.length === 0 ? (
+          <Empty text="No chat messages yet." />
+        ) : (
+          chat.map((c) => (
+            <div
+              key={c.id}
+              style={{
+                background: TOKENS.bg,
+                padding: "8px 12px",
+                borderRadius: 8,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: UI_FONT,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: TOKENS.primary,
+                }}
+              >
+                {c.sender}
+              </div>
+              <div
+                style={{
+                  fontFamily: BODY_FONT,
+                  fontSize: 14,
+                  color: TOKENS.ink,
+                  marginTop: 2,
+                }}
+              >
+                {c.text}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          gap: 8,
+          borderTop: `1px solid ${TOKENS.grid}`,
+          paddingTop: 10,
+        }}
+      >
+        <input
+          style={{ ...inputStyle, width: 120 }}
+          value={sender}
+          onChange={(e) => setSender(e.target.value)}
+          placeholder="Name"
+        />
+        <input
+          style={{ ...inputStyle, flex: 1 }}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && send()}
+          placeholder="Type a message..."
+        />
+        <Button onClick={send}>
+          <Send size={14} />
+        </Button>
+      </div>
+    </Card>
   );
 }
